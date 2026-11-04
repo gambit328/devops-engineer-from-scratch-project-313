@@ -17,7 +17,6 @@
 ```bash
 git clone https://github.com/gambit328/devops-engineer-from-scratch-project-313.git
 cd devops-engineer-from-scratch-project-313
-make run
 ```
 
 ## Использование
