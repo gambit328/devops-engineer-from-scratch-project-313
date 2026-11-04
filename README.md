@@ -4,8 +4,7 @@
 
 Создайте и задеплойте веб-приложение, подключите базу данных и настройте мониторинг ошибок
 
-Учебный проект Хекслета: https://ru.hexlet.io/programs/devops-engineer-from-scratch
-
+Учебный проект Хекслета: <https://ru.hexlet.io/programs/devops-engineer-from-scratch>
 
 ## Стек
 
@@ -18,9 +17,14 @@
 ```bash
 git clone https://github.com/gambit328/devops-engineer-from-scratch-project-313.git
 cd devops-engineer-from-scratch-project-313
+make run
 ```
 
 ## Использование
+
+```bash
+make run
+```
 
 <!-- Добавьте примеры запуска и запись asciinema — именно это смотрит работодатель -->
 
