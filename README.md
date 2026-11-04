@@ -1,6 +1,7 @@
 # Деплой приложения на PaaS (Devops)
 
 [![hexlet-check](https://github.com/gambit328/devops-engineer-from-scratch-project-313/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/gambit328/devops-engineer-from-scratch-project-313/actions)
+[![ci](https://github.com/gambit328/devops-engineer-from-scratch-project-313/actions/workflows/ci.yml/badge.svg)](https://github.com/gambit328/devops-engineer-from-scratch-project-313/actions/workflows/ci.yml)
 
 Создайте и задеплойте веб-приложение, подключите базу данных и настройте мониторинг ошибок
 
