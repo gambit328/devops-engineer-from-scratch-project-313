@@ -1,5 +1,7 @@
+import os
+
+import sentry_sdk
 from flask import Flask
-import os, sentry_sdk
 
 app = Flask(__name__)
 
