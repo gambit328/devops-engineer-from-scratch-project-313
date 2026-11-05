@@ -13,3 +13,8 @@ if dsn:
 @app.get("/ping")
 def ping():
     return "pong"
+
+
+@app.get("/raise")
+def oops():
+    raise RuntimeError("Oops!")
