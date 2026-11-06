@@ -28,7 +28,7 @@ make run
 
 <!-- Добавьте примеры запуска и запись asciinema — именно это смотрит работодатель -->
 
-Приложение: devops-engineer-from-scratch-project-313-61xr.onrender.com
+Приложение: <https://devops-engineer-from-scratch-project-313-61xr.onrender.com>
 
 ![Bugsink event](screenshots/bugsink-event.png)
 
