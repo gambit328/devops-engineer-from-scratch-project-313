@@ -2,7 +2,8 @@ import os
 
 import sentry_sdk
 from flask import Flask
-from sqlmodel import create_engine
+from sqlmodel import SQLModel, create_engine
+from models import Links
 
 app = Flask(__name__)
 
@@ -15,6 +16,8 @@ if url:
     if url.startswith("postgres://"):
         url = "postgresql://" + url[len("postgres://") :]
     engine = create_engine(url)
+
+    SQLModel.metadata.create_all(engine)
 
 
 @app.get("/ping")
