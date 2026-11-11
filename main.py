@@ -3,7 +3,8 @@ import os
 import sentry_sdk
 from flask import Flask
 from sqlmodel import SQLModel, create_engine
-from models import Links
+
+from models import Links  # noqa: F401
 
 app = Flask(__name__)
 
