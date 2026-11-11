@@ -1,7 +1,7 @@
 import os
 
 import sentry_sdk
-from flask import Flask
+from flask import Flask, request
 from sqlmodel import Session, SQLModel, create_engine, select
 
 from models import Links
@@ -52,7 +52,24 @@ def get_links():
 
 @app.post("/api/links")
 def post_links():
-    pass
+    data_user = request.get_json()
+    link = Links(
+        original_url=data_user["original_url"], short_name=data_user["short_name"]
+    )
+
+    with Session(engine) as session:
+        session.add(link)
+        session.commit()
+        session.refresh(link)
+
+        data_added = {
+            "id": link.id,
+            "original_url": link.original_url,
+            "short_name": link.short_name,
+            "short_url": f"{base_url}/r/{link.short_name}",
+        }
+
+    return data_added, 201
 
 
 @app.get("/api/links/<int:id>")
