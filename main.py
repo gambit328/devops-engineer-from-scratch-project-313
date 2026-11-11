@@ -2,11 +2,13 @@ import os
 
 import sentry_sdk
 from flask import Flask
-from sqlmodel import SQLModel, create_engine
+from sqlmodel import Session, SQLModel, create_engine, select
 
-from models import Links  # noqa: F401
+from models import Links
 
 app = Flask(__name__)
+
+base_url = os.getenv("BASE_URL")
 
 dsn = os.getenv("SENTRY_DSN")
 if dsn:
@@ -33,7 +35,19 @@ def oops():
 
 @app.get("/api/links")
 def get_links():
-    pass
+    links = []
+    with Session(engine) as session:
+        statement = select(Links)
+        data_from_db = session.exec(statement).all()
+        for row in data_from_db:
+            link = {
+                "id": row.id,
+                "original_url": row.original_url,
+                "short_name": row.short_name,
+                "short_url": f"{base_url}/r/{row.short_name}",
+            }
+            links.append(link)
+    return links
 
 
 @app.post("/api/links")
