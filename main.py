@@ -78,7 +78,17 @@ def post_links():
 
 @app.get("/api/links/<int:id>")
 def get_link(id):
-    pass
+    with Session(engine) as session:
+        result_link = session.get(Links, id)
+        if result_link:
+            result = {
+                "id": result_link.id,
+                "original_url": result_link.original_url,
+                "short_name": result_link.short_name,
+                "short_url": f"{base_url}/r/{result_link.short_name}",
+            }
+            return result, 200
+        return {"detail": "A link with this id does not exist"}, 404
 
 
 @app.put("/api/links/<int:id>")
