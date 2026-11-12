@@ -80,20 +80,45 @@ def post_links():
 def get_link(id):
     with Session(engine) as session:
         result_link = session.get(Links, id)
-        if result_link:
-            result = {
-                "id": result_link.id,
-                "original_url": result_link.original_url,
-                "short_name": result_link.short_name,
-                "short_url": f"{base_url}/r/{result_link.short_name}",
-            }
-            return result, 200
-        return {"detail": "A link with this id does not exist"}, 404
+
+        if not result_link:
+            return {"detail": "A link with this id does not exist"}, 404
+
+        result = {
+            "id": result_link.id,
+            "original_url": result_link.original_url,
+            "short_name": result_link.short_name,
+            "short_url": f"{base_url}/r/{result_link.short_name}",
+        }
+
+    return result, 200
 
 
 @app.put("/api/links/<int:id>")
 def put_link(id):
-    pass
+
+    with Session(engine) as session:
+        result_link = session.get(Links, id)
+
+        if not result_link:
+            return {"detail": "The link does not exist"}, 404
+
+        data_user = request.get_json()
+        try:
+            result_link.original_url = data_user["original_url"]
+            result_link.short_name = data_user["short_name"]
+            session.commit()
+        except IntegrityError:
+            return {"detail": "short_name already exists"}, 422
+
+        result = {
+            "id": result_link.id,
+            "original_url": result_link.original_url,
+            "short_name": result_link.short_name,
+            "short_url": f"{base_url}/r/{result_link.short_name}",
+        }
+
+    return result, 200
 
 
 @app.delete("/api/links/<int:id>")
