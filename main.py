@@ -2,6 +2,7 @@ import os
 
 import sentry_sdk
 from flask import Flask, request
+from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session, SQLModel, create_engine, select
 
 from models import Links
@@ -58,9 +59,12 @@ def post_links():
     )
 
     with Session(engine) as session:
-        session.add(link)
-        session.commit()
-        session.refresh(link)
+        try:
+            session.add(link)
+            session.commit()
+            session.refresh(link)
+        except IntegrityError:
+            return {"detail": "short_name already exists"}, 422
 
         data_added = {
             "id": link.id,
