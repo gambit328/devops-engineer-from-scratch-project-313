@@ -1,7 +1,7 @@
 import os
 
 import sentry_sdk
-from flask import Flask, request
+from flask import Flask, redirect, request
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session, SQLModel, create_engine, select
 
@@ -137,4 +137,11 @@ def delete_link(id):
 
 @app.get("/r/<short_name>")
 def get_short_name(short_name):
-    pass
+    with Session(engine) as session:
+        stmt = select(Links).where(Links.short_name == short_name)
+        found_link = session.exec(stmt).first()
+
+        if not found_link:
+            return {"detail": "Link with the short_name does not exist"}, 404
+
+        return redirect(found_link.original_url)
