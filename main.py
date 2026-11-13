@@ -54,6 +54,11 @@ def get_links():
 @app.post("/api/links")
 def post_links():
     data_user = request.get_json()
+
+    errors = check_request(data_user)
+    if errors["detail"]:
+        return errors, 422
+
     link = Links(
         original_url=data_user["original_url"], short_name=data_user["short_name"]
     )
@@ -96,6 +101,11 @@ def get_link(id):
 
 @app.put("/api/links/<int:id>")
 def put_link(id):
+    data_user = request.get_json()
+
+    errors = check_request(data_user)
+    if errors["detail"]:
+        return errors, 422
 
     with Session(engine) as session:
         found_link = session.get(Links, id)
@@ -103,7 +113,6 @@ def put_link(id):
         if not found_link:
             return {"detail": "The link does not exist"}, 404
 
-        data_user = request.get_json()
         try:
             found_link.original_url = data_user["original_url"]
             found_link.short_name = data_user["short_name"]
@@ -145,3 +154,17 @@ def get_short_name(short_name):
             return {"detail": "Link with the short_name does not exist"}, 404
 
         return redirect(found_link.original_url)
+
+
+def check_request(data_user):
+    result = {"detail": []}
+
+    if type(data_user) is not dict:
+        result["detail"].append({"type": "type of data is wrong"})
+        return result
+
+    if not "original_url" in data_user:
+        result["detail"].append({"original_url": "missing"})
+    if not "short_name" in data_user:
+        result["detail"].append({"short_name": "missing"})
+    return result
