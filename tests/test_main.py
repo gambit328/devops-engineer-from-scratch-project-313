@@ -1,4 +1,29 @@
+import pytest
+
 from main import app
+
+
+@pytest.fixture
+def make_link():
+    created_links = []
+    client = app.test_client()
+
+    def _make(short_name, original_url="https://example.com/long-url"):
+        response = client.post(
+            "/api/links", json={"original_url": original_url, "short_name": short_name}
+        )
+
+        assert response.status_code == 201
+
+        data = response.get_json()
+        created_links.append(data)
+
+        return data
+
+    yield _make
+
+    for elem in created_links:
+        client.delete(f"/api/links/{elem['id']}")
 
 
 def test_ping():
@@ -31,20 +56,11 @@ def test_post_links():
     client.delete(f"/api/links/{data['id']}")
 
 
-def test_get_link():
+def test_get_link(make_link):
     client = app.test_client()
-    response = client.post(
-        "/api/links",
-        json={"original_url": "https://example.com/long-url", "short_name": "t2"},
-    )
-    assert response.status_code == 201
-
-    created_data = response.get_json()
+    created_data = make_link("t2")
     response = client.get(f"/api/links/{created_data['id']}")
     data = response.get_json()
-
-    response_error = client.get("/api/links/999999")
-    data_error = response_error.get_json()
 
     assert response.status_code == 200
     assert "id" in data and "short_name" in data
@@ -52,25 +68,25 @@ def test_get_link():
         created_data["id"] == data["id"]
         and created_data["short_name"] == data["short_name"]
     )
-    assert response_error.status_code == 404
-    assert "A link with this id does not exist" == data_error["detail"]
-
-    client.delete(f"/api/links/{data['id']}")
 
 
-def test_put_link():
+def test_get_link_404():
     client = app.test_client()
-    response = client.post(
-        "/api/links",
-        json={"original_url": "https://example.com/long-url", "short_name": "t3"},
-    )
-    assert response.status_code == 201
+    response = client.get("/api/links/9999999")
+    data = response.get_json()
 
+    assert response.status_code == 404
+    assert "A link with this id does not exist" == data["detail"]
+
+
+def test_put_link(make_link):
+    client = app.test_client()
     result = {
         "original_url": "https://example1.com/long-url",
         "short_name": "t3-update",
     }
-    created_data = response.get_json()
+    created_data = make_link("t3")
+
     response = client.put(
         f"/api/links/{created_data['id']}",
         json=result,
@@ -82,8 +98,6 @@ def test_put_link():
     assert result["original_url"] == created_data_update["original_url"]
     assert result["short_name"] == created_data_update["short_name"]
 
-    client.delete(f"/api/links/{created_data['id']}")
-
 
 def test_put_link_404():
     client = app.test_client()
@@ -94,18 +108,10 @@ def test_put_link_404():
     assert response.status_code == 404
 
 
-def test_put_link_wrong_body():
+def test_put_link_wrong_body(make_link):
     client = app.test_client()
-    response = client.post(
-        "/api/links",
-        json={
-            "original_url": "https://example.com/long-url",
-            "short_name": "t6",
-        },
-    )
-    assert response.status_code == 201
+    created_data = make_link("t6")
 
-    created_data = response.get_json()
     response_wrong_type_body = client.put(
         f"/api/links/{created_data['id']}", json="wrong type body"
     )
@@ -133,40 +139,20 @@ def test_put_link_wrong_body():
     assert response_wrong_short_name.status_code == 422
     assert data_wrong_short_name["detail"] == [{"short_name": "missing"}]
 
-    client.delete(f"/api/links/{created_data['id']}")
 
-
-def test_put_link_double():
+def test_put_link_double(make_link):
     client = app.test_client()
-    response1 = client.post(
-        "/api/links",
-        json={
-            "original_url": "https://example1.com/long-url",
-            "short_name": "t7",
-        },
-    )
-    assert response1.status_code == 201
-
-    response2 = client.post(
-        "/api/links",
-        json={
-            "original_url": "https://example2.com/long-url",
-            "short_name": "t8",
-        },
-    )
-    assert response2.status_code == 201
-
-    created_data1 = response1.get_json()
-    created_data2 = response2.get_json()
+    created_data1 = make_link("t7")
+    created_data2 = make_link("t8")
 
     response_double = client.put(
         f"/api/links/{created_data2['id']}",
-        json={"original_url": "https://example3.com/long-url", "short_name": "t7"},
+        json={
+            "original_url": "https://example3.com/long-url",
+            "short_name": created_data1["short_name"],
+        },
     )
     data_double = response_double.get_json()
 
     assert response_double.status_code == 422
     assert data_double["detail"] == "short_name already exists"
-
-    client.delete(f"/api/links/{created_data1['id']}")
-    client.delete(f"/api/links/{created_data2['id']}")
