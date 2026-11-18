@@ -175,3 +175,22 @@ def test_delete_link_404():
 
     assert response.status_code == 404
     assert "The link does not exist" == data["detail"]
+
+
+def test_get_short_name(make_link):
+    client = app.test_client()
+    data = make_link("t10")
+    response = client.get(f"/r/{data['short_name']}")
+    headers_location = response.headers["Location"]
+
+    assert response.status_code == 302
+    assert data["original_url"] == headers_location
+
+
+def test_get_short_name_404():
+    client = app.test_client()
+    response = client.get("/r/t11")
+    data = response.get_json()
+
+    assert response.status_code == 404
+    assert "Link with the short_name does not exist" == data["detail"]
