@@ -156,3 +156,22 @@ def test_put_link_double(make_link):
 
     assert response_double.status_code == 422
     assert data_double["detail"] == "short_name already exists"
+
+
+def test_delete_link(make_link):
+    client = app.test_client()
+    created_data = make_link("t9")
+
+    response = client.delete(f"/api/links/{created_data['id']}")
+
+    assert response.status_code == 204
+    assert response.get_data() == b""
+
+
+def test_delete_link_404():
+    client = app.test_client()
+    response = client.delete("/api/links/99999999")
+    data = response.get_json()
+
+    assert response.status_code == 404
+    assert "The link does not exist" == data["detail"]
