@@ -37,9 +37,18 @@ def oops():
 @app.get("/api/links")
 def get_links():
     links = []
+
+    query_range = request.args.get("range")
+    if query_range is not None:
+        range_links = query_range.strip("[]").split(",")
+        start = int(range_links[0])
+        finish = int(range_links[1])
+        stmt = select(Links).order_by(Links.id).limit(finish - start).offset(start)
+    else:
+        stmt = select(Links)
+
     with Session(engine) as session:
-        statement = select(Links)
-        data_from_db = session.exec(statement).all()
+        data_from_db = session.exec(stmt).all()
         for row in data_from_db:
             link = {
                 "id": row.id,
@@ -48,6 +57,7 @@ def get_links():
                 "short_url": f"{base_url}/r/{row.short_name}",
             }
             links.append(link)
+
     return links
 
 
