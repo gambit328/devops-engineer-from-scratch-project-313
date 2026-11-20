@@ -3,6 +3,7 @@ import os
 import sentry_sdk
 from flask import Flask, redirect, request
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import func
 from sqlmodel import Session, SQLModel, create_engine, select
 
 from models import Links
@@ -39,15 +40,19 @@ def get_links():
     links = []
 
     query_range = request.args.get("range")
+    stmt_total = select(func.count()).select_from(Links)
     if query_range is not None:
         range_links = query_range.strip("[]").split(",")
         start = int(range_links[0])
         finish = int(range_links[1])
         stmt = select(Links).order_by(Links.id).limit(finish - start).offset(start)
     else:
-        stmt = select(Links)
+        start = None
+        finish = None
+        stmt = select(Links).order_by(Links.id)
 
     with Session(engine) as session:
+        total = session.exec(stmt_total).one()
         data_from_db = session.exec(stmt).all()
         for row in data_from_db:
             link = {
@@ -58,7 +63,9 @@ def get_links():
             }
             links.append(link)
 
-    return links
+    if query_range is None:
+        return links
+    return (links, 200, {"Content-Range": f"links {start}-{finish}/{total}"})
 
 
 @app.post("/api/links")
