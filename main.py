@@ -2,8 +2,8 @@ import os
 
 import sentry_sdk
 from flask import Flask, redirect, request
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy import func
+from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session, SQLModel, create_engine, select
 
 from models import Links
