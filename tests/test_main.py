@@ -42,6 +42,24 @@ def test_get_links():
     assert type(response.get_json()) == list
 
 
+def test_get_links_with_range(make_link):
+    client = app.test_client()
+
+    for i in range(15):
+        make_link(f"p{i}")
+
+    response = client.get("/api/links")
+    assert response.status_code == 200
+    all_links = response.get_json()
+
+    response = client.get("/api/links?range=[5,10]")
+    assert response.status_code == 200
+    part_links = response.get_json()
+
+    assert all_links[5:10] == part_links
+    assert response.headers.get("Content-Range") == f"links 5-10/{len(all_links)}"
+
+
 def test_post_links():
     client = app.test_client()
     response = client.post(
