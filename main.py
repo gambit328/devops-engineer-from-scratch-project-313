@@ -185,3 +185,12 @@ def check_request(data_user):
     if not "short_name" in data_user:
         result["detail"].append({"short_name": "missing"})
     return result
+
+
+@app.after_request
+def add_cors_headers(response):
+    response.headers["Access-Control-Allow-Origin"] = "http://localhost:5173"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+    response.headers["Access-Control-Expose-Headers"] = "Content-Range"
+    return response
