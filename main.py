@@ -1,14 +1,14 @@
 import os
 
 import sentry_sdk
-from flask import Flask, redirect, request
+from flask import Flask, redirect, request, send_from_directory
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session, SQLModel, create_engine, select
 
 from models import Links
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="public", static_url_path="")
 
 base_url = os.getenv("BASE_URL")
 
@@ -194,3 +194,8 @@ def add_cors_headers(response):
     response.headers["Access-Control-Allow-Headers"] = "Content-Type"
     response.headers["Access-Control-Expose-Headers"] = "Content-Range"
     return response
+
+
+@app.get("/")
+def index():
+    return send_from_directory("public", "index.html")
