@@ -1,7 +1,7 @@
 .PHONY: dev
 
 run:
-	uv run flask --app main --debug run --port 8080
+	uv run flask --app main --debug run --host 0.0.0.0 --port 8080
 
 test:
 	uv run pytest
