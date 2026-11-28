@@ -50,7 +50,7 @@ wheels = [
 [[package]]
 name = "devops-engineer-from-scratch-project-313"
 version = "0.1.0"
-source = { editable = "." }
+source = { virtual = "." }
 dependencies = [
     { name = "flask" },
     { name = "psycopg", extra = ["binary"] },
