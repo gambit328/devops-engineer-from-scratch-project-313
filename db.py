@@ -1,6 +1,7 @@
 import os
 
 from sqlmodel import SQLModel, create_engine
+
 from models import Links  # noqa: F401
 
 url = os.getenv("DATABASE_URL")
