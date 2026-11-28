@@ -9,16 +9,32 @@
 
 ## Стек
 
-- Python
+- Python 3.11
+- Flask
+- SQLModel + PostgreSQL
+- React Admin (UI-пакет от Hexlet)
+- Docker
+- Render
+- Bugsink
 
 ## Установка
 
-<!-- Опишите установку: клонирование, зависимости, переменные окружения -->
+- uv
+- make
+- Node.js 20.19+ или 22.12+ (для сборки UI)
 
 ```bash
 git clone https://github.com/gambit328/devops-engineer-from-scratch-project-313.git
 cd devops-engineer-from-scratch-project-313
+
+make build
 ```
+
+### Переменные окружения
+
+- DATABASE_URL (строка подключения к postgresql)
+- BASE_URL (публичный адрес приложения. нужен для short_url)
+- SENTRY_DSN (DSN из Bugsink для мониторинга)
 
 ## Использование
 
